@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NutriCheck</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f7f5;
+    color: #1f2937;
+}
+
+header {
+    background: #159447;
+    color: white;
+    padding: 22px 18px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 32px;
+    margin-bottom: 6px;
+}
+
+header p {
+    font-size: 15px;
+    opacity: 0.95;
+}
+
+.container {
+    max-width: 650px;
+    margin: 25px auto;
+    padding: 0 18px;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    margin-bottom: 15px;
+    color: #159447;
+}
+
+input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #d1d5db;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #159447;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 12px;
+    background: #159447;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #10763a;
+}
+
+.example {
+    color: #6b7280;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+#result {
+    display: none;
+}
+
+.food-name {
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.status {
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    font-weight: bold;
+}
+
+.good {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat {
+    background: #f3f4f6;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.stat strong {
+    display: block;
+    font-size: 22px;
+    color: #159447;
+}
+
+.stat span {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.info {
+    margin-top: 18px;
+    line-height: 1.6;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #6b7280;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🥗 NutriCheck</h1>
+    <p>Smart food screening prototype</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Check Your Food</h2>
+
+        <input
+            type="text"
+            id="foodInput"
+            placeholder="Enter a food e.g. apple, rice, egg"
+        >
+
+        <button onclick="checkFood()">Check Food</button>
+
+        <p class="example">
+            Try: apple, banana, rice, egg, chicken, milk, pizza, burger
+        </p>
+    </div>
+
+    <div class="card" id="result">
+
+        <div class="food-name" id="foodName"></div>
+
+        <div class="status" id="status"></div>
+
+        <div class="stats">
+
+            <div class="stat">
+                <strong id="calories">-</strong>
+                <span>Calories</span>
+            </div>
+
+            <div class="stat">
+                <strong id="protein">-</strong>
+                <span>Protein</span>
+            </div>
+
+            <div class="stat">
+                <strong id="carbs">-</strong>
+                <span>Carbohydrates</span>
+            </div>
+
+            <div class="stat">
+                <strong id="fat">-</strong>
+                <span>Fat</span>
+            </div>
+
+        </div>
+
+        <div class="info">
+            <strong>NutriCheck analysis:</strong>
+            <p id="message"></p>
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    NutriCheck • Food Screening Prototype
+</footer>
+
+<script>
+
+const foods = {
+
+    apple: {
+        calories: "52 kcal",
+        protein: "0.3 g",
+        carbs: "14 g",
+        fat: "0.2 g",
+        status: "Generally a healthy choice",
+        type: "good",
+        message: "Apple provides carbohydrates and dietary fibre and can be a convenient fruit choice."
+    },
+
+    banana: {
+        calories: "89 kcal",
+        protein: "1.1 g",
+        carbs: "23 g",
+        fat: "0.3 g",
+        status: "Generally a healthy choice",
+        type: "good",
+        message: "Bananas provide carbohydrates and potassium and can be useful as an energy-rich fruit."
+    },
+
+    rice: {
+        calories: "130 kcal",
+        protein: "2.7 g",
+        carbs: "28 g",
+        fat: "0.3 g",
+        status: "Moderate",
+        type: "good",
+        message: "Rice is mainly a carbohydrate source. Portion size and preparation method matter."
+    },
+
+    egg: {
+        calories: "155 kcal",
+        protein: "13 g",
+        carbs: "1.1 g",
+        fat: "11 g",
+        status: "Protein-rich food",
+        type: "good",
+        message: "Eggs provide high-quality protein along with fats and several micronutrients."
+    },
+
+    chicken: {
+        calories: "165 kcal",
+        protein: "31 g",
+        carbs: "0 g",
+        fat: "3.6 g",
+        status: "Protein-rich food",
+        type: "good",
+        message: "Chicken is a protein-rich food. Preparation method can significantly affect its nutritional profile."
+    },
+
+    milk: {
+        calories: "61 kcal",
+        protein: "3.2 g",
+        carbs: "4.8 g",
+        fat: "3.3 g",
+        status: "Moderate",
+        type: "good",
+        message: "Milk provides protein and calcium. Nutritional values vary depending on the type of milk."
+    },
+
+    pizza: {
+        calories: "266 kcal",
+        protein: "11 g",
+        carbs: "33 g",
+        fat: "10 g",
+        status: "Higher-calorie food",
+        type: "warning",
+        message: "Pizza can be high in calories, refined carbohydrates, sodium and fat depending on toppings and portion size."
+    },
+
+    burger: {
+        calories: "295 kcal",
+        protein: "17 g",
+        carbs: "24 g",
+        fat: "14 g",
+        status: "Higher-calorie food",
+        type: "warning",
+        message: "Burgers can provide protein but may also contain substantial calories, sodium and saturated fat."
+    },
+
+    chocolate: {
+        calories: "546 kcal",
+        protein: "4.9 g",
+        carbs: "61 g",
+        fat: "31 g",
+        status: "Energy-dense food",
+        type: "warning",
+        message: "Chocolate can be energy-dense and may contain significant added sugar and fat. Portion size matters."
+    },
+
+    chips: {
+        calories: "536 kcal",
+        protein: "7 g",
+        carbs: "53 g",
+        fat: "35 g",
+        status: "Energy-dense food",
+        type: "warning",
+        message: "Packaged chips are often high in calories, fat and sodium."
+    }
+
+};
+
+function checkFood() {
+
+    const input = document
+        .getElementById("foodInput")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const result = document.getElementById("result");
+
+    if (input === "") {
+        alert("Please enter a food name.");
+        return;
+    }
+
+    let food = foods[input];
+
+    if (!food) {
+
+        result.style.display = "block";
+
+        document.getElementById("foodName").textContent =
+            input.charAt(0).toUpperCase() + input.slice(1);
+
+        document.getElementById("status").textContent =
+            "Food not found in prototype database";
+
+        document.getElementById("status").className =
+            "status warning";
+
+        document.getElementById("calories").textContent = "-";
+        document.getElementById("protein").textContent = "-";
+        document.getElementById("carbs").textContent = "-";
+        document.getElementById("fat").textContent = "-";
+
+        document.getElementById("message").textContent =
+            "This prototype currently contains a limited food database. Try apple, banana, rice, egg, chicken, milk, pizza or burger.";
+
+        return;
+    }
+
+    result.style.display = "block";
+
+    document.getElementById("foodName").textContent =
+        input.charAt(0).toUpperCase() + input.slice(1);
+
+    const status = document.getElementById("status");
+
+    status.textContent = food.status;
+    status.className = "status " + food.type;
+
+    document.getElementById("calories").textContent =
+        food.calories;
+
+    document.getElementById("protein").textContent =
+        food.protein;
+
+    document.getElementById("carbs").textContent =
+        food.carbs;
+
+    document.getElementById("fat").textContent =
+        food.fat;
+
+    document.getElementById("message").textContent =
+        food.message;
+}
+
+document
+    .getElementById("foodInput")
+    .addEventListener("keypress", function(event) {
+
+        if (event.key === "Enter") {
+            checkFood();
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
